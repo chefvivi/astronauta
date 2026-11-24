@@ -213,15 +213,14 @@ html.freed .chip i{background:var(--green);box-shadow:0 0 8px rgba(48,209,88,.7)
 .paid{color:var(--green);font-size:34px;letter-spacing:-.035em;white-space:nowrap}
 .head-row{display:flex;justify-content:space-between;align-items:center}
 .pct{font-size:13px;font-weight:600;color:var(--text-2);font-variant-numeric:tabular-nums}
-.countdown{display:grid;grid-template-columns:repeat(4,1fr);margin-top:12px}
+.countdown{display:grid;grid-template-columns:repeat(3,1fr);margin-top:8px}
 .unit{display:flex;flex-direction:column;align-items:flex-start}
 .unit b{font-size:32px;line-height:1;font-weight:600;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
 .unit span{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
-.bf-now{display:none;margin-top:12px;font-size:26px;font-weight:700;letter-spacing:-.03em;
-  background:linear-gradient(90deg,#ffb340,#ff453a);-webkit-background-clip:text;background-clip:text;color:transparent}
-.card.ended .countdown{display:none}
-.card.ended .bf-now{display:block}
-.bar{position:relative;height:8px;margin-top:14px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.mood{margin-top:8px;font-size:26px;line-height:1.1;font-weight:700;letter-spacing:-.03em}
+.next{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07)}
+.next-label{font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--text-3)}
+.bar{position:relative;height:8px;margin-top:12px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
 .bar-fill{position:absolute;inset:0;border-radius:inherit;transform-origin:left center;
   background:linear-gradient(90deg,#3d7bff,var(--cyan));transition:transform .9s var(--ease-out),background .6s}
 .bar-fill::after{content:"";position:absolute;inset:0;
@@ -284,7 +283,7 @@ footer b{color:var(--text-2);font-weight:600}
 .sheet-icon{width:64px;height:64px;margin:4px auto 0;display:grid;place-items:center;border-radius:20px;
   background:linear-gradient(180deg,rgba(255,69,58,.22),rgba(255,69,58,.10));border:1px solid rgba(255,69,58,.28)}
 .sheet-icon svg{width:34px;height:34px}
-.sheet[data-level="3"] .sheet-icon,.sheet[data-level="4"] .sheet-icon,.sheet[data-level="5"] .sheet-icon,.sheet[data-level="6"] .sheet-icon{animation:alarm 1.6s ease-in-out infinite}
+.sheet[data-alarm="1"] .sheet-icon{animation:alarm 1.6s ease-in-out infinite}
 @keyframes alarm{50%{box-shadow:0 0 0 8px rgba(255,69,58,.12),0 0 34px rgba(255,69,58,.45)}}
 .sheet h2{margin-top:16px;font-size:22px;font-weight:700;letter-spacing:-.025em}
 .sheet .msg{margin-top:8px;font-size:16px;line-height:1.42;color:var(--text-2)}
@@ -503,7 +502,7 @@ body.has-install .app{padding-bottom:calc(var(--sab) + 110px)}
   <section class="stats">
     <article class="glass card reveal" style="--i:5">
       <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="daysLabel">Días encerrado</span></div>
-      <div class="value" id="days">1</div>
+      <div class="value" id="days">1<small>día</small></div>
       <div class="foot">Desde el 23/11/2026</div>
     </article>
     <article class="glass card reveal" style="--i:6">
@@ -511,20 +510,22 @@ body.has-install .app{padding-bottom:calc(var(--sab) + 110px)}
       <div class="value" id="ransom">$1,399</div>
       <div class="foot" id="ransomFoot">MXN · una sola vez</div>
     </article>
-    <article class="glass card wide reveal" style="--i:7" id="o2Card">
+    <article class="glass card wide reveal" style="--i:7" id="moodCard">
       <div class="head-row">
-        <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/></svg><span id="o2Label">Oxígeno hasta Black Friday</span></div>
-        <span class="pct" id="o2Pct">O₂ 100%</span>
+        <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20z"/></svg><span>Ánimo del astronauta</span></div>
+        <span class="pct" id="moodPct">100%</span>
       </div>
-      <div class="countdown" id="countdown" aria-live="off">
-        <div class="unit"><b id="cdD">00</b><span>días</span></div>
-        <div class="unit"><b id="cdH">00</b><span>horas</span></div>
-        <div class="unit"><b id="cdM">00</b><span>min</span></div>
-        <div class="unit"><b id="cdS">00</b><span>seg</span></div>
+      <div class="mood" id="mood">Tranquilo</div>
+      <div class="bar"><div class="bar-fill" id="moodFill"></div></div>
+      <div class="next" id="next">
+        <span class="next-label">Otro día encerrado en</span>
+        <div class="countdown" aria-live="off">
+          <div class="unit"><b id="cdH">00</b><span>horas</span></div>
+          <div class="unit"><b id="cdM">00</b><span>min</span></div>
+          <div class="unit"><b id="cdS">00</b><span>seg</span></div>
+        </div>
       </div>
-      <div class="bf-now" id="bfNow">Black Friday ya empezó</div>
-      <div class="bar"><div class="bar-fill" id="o2Fill"></div></div>
-      <div class="foot" id="o2Foot">27 nov 2026 · 00:00 hora de Monterrey</div>
+      <div class="foot" id="moodFoot">A medianoche (hora de Monterrey) se suma un día</div>
     </article>
   </section>
 
@@ -585,31 +586,59 @@ body.has-install .app{padding-bottom:calc(var(--sab) + 110px)}
 
 /* ================== Datos de la misión ================== */
 const START_DAY = Date.UTC(2026, 10, 23);                  // 23/11/2026 (fecha de Monterrey)
-const O2_START  = Date.parse('2026-11-23T00:00:00-06:00');  // inicio del encierro, hora MTY
-const BLACK_FRIDAY = Date.parse('2026-11-27T00:00:00-06:00');
 const FREED = new URLSearchParams(location.search).get('liberado') === '1';
 
+// Un mensaje por día: cada vez más desesperado.
 const MESSAGES = [
-  'Día {n} aquí adentro. Ya conté todas las estrellas que se ven desde la celda. Dos veces.',
-  'Houston, tenemos un problema: sigo encerrado. Houston dice que hable con Mamá.',
-  'Hoy intenté abrir el candado con la mente. Avance: 0%. Creo que sí necesito la llave.',
-  'Aquí no hay gravedad, pero sí mucha esperanza. Floto, espero, vuelvo a flotar. 🥺',
-  'Vivi dice que eres la mejor del universo. Lo verifiqué con el telescopio: es cierto.',
-  'Dato científico: un astronauta liberado es 100% más feliz. Fuente: yo.',
-  'Ya me sé de memoria el camino a la repisa de Vivi. Solo me falta salir de aquí.',
-  'El oxígeno baja, pero mi fe en ti no. Bueno… el oxígeno sí baja un poquito. ⏳',
-  'Le puse nombre a cada barrote. El de en medio se llama "Ya mero".',
-  'Prometo quedarme quietecito en la repisa y no hacer ruido. Palabra de astronauta. 🫡'
+  'Hola, Mamá. Día 1 aquí adentro. Estoy bien, de verdad… solo un poquito encerrado. 🙂',
+  'Día 2. Ya conté todas las estrellas que se ven desde la celda. Dos veces. ¿Me sacas?',
+  'Día 3. Hoy intenté abrir el candado con la mente. Avance: 0%. Creo que sí necesito la llave.',
+  'Día 4. Extraño a mi familia. Dicen que en la repisa de Vivi hay más astronautas como yo. 🥺',
+  'Día 5. No tengo con quién jugar. Le lancé una pelota al barrote y no me la regresó.',
+  'Día 6. Ya platico con mi reflejo en el visor. Lo malo es que siempre me da la razón.',
+  'Día 7. Una semana entera aquí. Ya, por favor. Quiero salir. Quiero ver algo que no sean barrotes.',
+  'Día 8. Quiero a alguien con quien hablar. Las estrellas son bonitas, pero no contestan.',
+  'Día 9. Soñé que me abrías la puerta. Desperté y seguía aquí. 😢',
+  'Día 10. Ya me sé de memoria cada tornillo de esta celda. Quiero ir a casa, Mamá.',
+  'Día 11. Les escribí una carta a mis amigos de la repisa. No la puedo mandar: estoy encerrado.',
+  'Día 12. Quiero flotar por la casa, conocer tu sala, explorar el mundo… ¿es mucho pedir? 🌍',
+  'Día 13. Ya casi no me queda ánimo. Solo me queda una esperanza, y esa esperanza eres tú.',
+  'Dos semanas, Mamá. Por favor. Quiero salir, quiero jugar, quiero explorar. Solo tú tienes la llave. 🔑'
+];
+// Después del día 14 se repiten estos, con el número de día.
+const MESSAGES_LOOP = [
+  'Día {n}. Sigo aquí. Sigo esperando. Sigo creyendo en ti, Mamá.',
+  'Día {n}. Quiero a alguien con quien hablar. ¿Me escuchas? Cambio. 📡',
+  'Día {n}. Hoy dibujé una puerta abierta en la pared. No funcionó. Necesito la de verdad.',
+  'Día {n}. Quiero ver a mi familia. Quiero explorar. Quiero salir. Por favor. 🥺',
+  'Día {n}. Houston, tenemos un problema: sigo encerrado. Houston dice que hable con Mamá.'
 ];
 
+// Reporte del candado: más dramático según los días.
 const DRAMA = [
-  { from: 1,  title: 'Candado bloqueado',            text: 'El astronauta está tranquilo… por ahora. Dice que confía plenamente en ti.' },
-  { from: 2,  title: 'Candado bloqueado',            text: 'Ya empezó a platicar con su reflejo en el visor. Lo preocupante es que el reflejo le contesta.' },
-  { from: 3,  title: 'Candado bloqueado',            text: 'Le puso nombre a cada barrote. Su favorito se llama Esperanza. Esperanza no dice nada.' },
-  { from: 4,  title: 'Alerta: candado bloqueado',    text: 'Reservas de oxígeno en zona roja. Black Friday es la última ventana de rescate. Repito: la última.' },
-  { from: 5,  title: 'Alerta: candado bloqueado',    text: 'Black Friday ya abrió la escotilla. El astronauta mira la puerta. La puerta lo mira a él. Nadie se mueve.' },
-  { from: 7,  title: 'Emergencia en la celda 01',    text: 'Una semana completa sin salir. El Centro de Control declara emergencia nivel máximo. Todos los ojos están en ti, Mamá.' },
-  { from: 14, title: 'Emergencia en la celda 01',    text: 'Escribió tu nombre con estrellas en la pared. Ya no le quedan estrellas. Solo le queda la llave… que tienes tú.' }
+  { from: 1,  title: 'Candado bloqueado',         text: 'El astronauta está tranquilo… por ahora. Dice que confía plenamente en ti.' },
+  { from: 2,  title: 'Candado bloqueado',         text: 'Ya empezó a platicar con su reflejo en el visor. Lo preocupante es que el reflejo le contesta.' },
+  { from: 3,  title: 'Candado bloqueado',         text: 'Le puso nombre a cada barrote. Su favorito se llama Esperanza. Esperanza no dice nada.' },
+  { from: 4,  title: 'Alerta: candado bloqueado', text: 'Extraña a su familia. Se pasa las horas mirando hacia la repisa de Vivi.' },
+  { from: 5,  title: 'Alerta: candado bloqueado', text: 'No tiene con quién jugar ni con quién hablar. Su ánimo va en picada.' },
+  { from: 7,  title: 'Emergencia en la celda 01', text: 'Una semana completa sin salir. El Centro de Control declara emergencia nivel máximo. Todos los ojos están en ti, Mamá.' },
+  { from: 10, title: 'Emergencia en la celda 01', text: 'Diez días. Ya no quiere su comida espacial. Solo repite: "quiero salir, quiero explorar".' },
+  { from: 14, title: 'SOS · Celda 01',            text: 'Escribió tu nombre con estrellas en la pared. Ya no le quedan estrellas. Solo le queda la llave… que tienes tú.' }
+];
+
+// Ánimo: baja 8% cada día (nunca menos de 5%).
+const MOODS = [
+  { min: 100, label: 'Tranquilo' },
+  { min: 92,  label: 'Paciente' },
+  { min: 84,  label: 'Aburrido' },
+  { min: 76,  label: 'Extraña a su familia' },
+  { min: 68,  label: 'Solito' },
+  { min: 60,  label: 'Triste' },
+  { min: 52,  label: 'Muy triste' },
+  { min: 44,  label: 'Quiere salir ya' },
+  { min: 28,  label: 'Desesperado' },
+  { min: 12,  label: 'Al límite' },
+  { min: 0,   label: 'SOS' }
 ];
 
 const FREED_TEXT = {
@@ -831,40 +860,45 @@ const Confetti = (() => {
   };
 })();
 
-/* ================== Días, mensaje y cuenta regresiva ================== */
+/* ================== Días, ánimo y mensaje ================== */
+const plural = n => n === 1 ? 'día' : 'días';
+function messageFor(n) {
+  const text = n <= MESSAGES.length ? MESSAGES[n - 1] : MESSAGES_LOOP[(n - MESSAGES.length - 1) % MESSAGES_LOOP.length];
+  return text.replace('{n}', n);
+}
+function moodFor(n) {
+  const pct = Math.max(5, 100 - (n - 1) * 8);
+  return { pct, label: MOODS.find(m => pct >= m.min).label };
+}
+
 let currentDay = 0;
 function renderDay() {
   const n = dayNumber();
   if (n === currentDay) return;
   currentDay = n;
-  if (!FREED) {
-    $('days').textContent = n;
-    $('eyebrow').textContent = `Misión · Día ${n}`;
-    $('message').textContent = MESSAGES[(n - 1) % MESSAGES.length].replace('{n}', n);
-  }
+  $('days').innerHTML = `${n}<small>${plural(n)}</small>`;
+  if (FREED) return;
+  $('eyebrow').textContent = `Misión · Día ${n}`;
+  $('message').textContent = messageFor(n);
+  const m = moodFor(n), fill = $('moodFill');
+  $('mood').textContent = m.label;
+  $('moodPct').textContent = `${m.pct}%`;
+  fill.style.transform = `scaleX(${m.pct / 100})`;
+  fill.dataset.level = m.pct < 25 ? 'crit' : m.pct < 60 ? 'low' : 'ok';
 }
 
-function renderCountdown() {
+// Cuenta regresiva a la siguiente medianoche de Monterrey (UTC-6), cuando se suma otro día.
+function renderNext() {
   if (FREED) return;
-  const now = Date.now(), left = BLACK_FRIDAY - now;
-  const pct = Math.max(0, Math.min(1, left / (BLACK_FRIDAY - O2_START)));
-  const fill = $('o2Fill');
-  fill.style.transform = `scaleX(${pct})`;
-  fill.dataset.level = pct < .1 ? 'crit' : pct < .3 ? 'low' : 'ok';
-  $('o2Pct').textContent = `O₂ ${Math.ceil(pct * 100)}%`;
-  if (left <= 0) {
-    $('o2Card').classList.add('ended');
-    $('o2Foot').textContent = 'La ventana de rescate está abierta';
-    return;
-  }
+  const [y, m, d] = mtyDate();
+  const left = Math.max(0, Date.UTC(y, m - 1, d + 1, 6) - Date.now());
   const s = Math.floor(left / 1000);
-  $('cdD').textContent = pad(Math.floor(s / 86400));
-  $('cdH').textContent = pad(Math.floor(s % 86400 / 3600));
+  $('cdH').textContent = pad(Math.floor(s / 3600));
   $('cdM').textContent = pad(Math.floor(s % 3600 / 60));
   $('cdS').textContent = pad(s % 60);
 }
 
-function tick() { renderDay(); renderCountdown(); }
+function tick() { renderDay(); renderNext(); }
 function startClock() {
   tick();
   setTimeout(() => { tick(); setInterval(tick, 1000); }, 1000 - (Date.now() % 1000));
@@ -883,7 +917,7 @@ let lastFocus = null;
 function dramaFor(n) {
   let d = DRAMA[0];
   for (const x of DRAMA) if (n >= x.from) d = x;
-  return { ...d, level: DRAMA.indexOf(d) };
+  return d;
 }
 
 function openSheet() {
@@ -891,7 +925,7 @@ function openSheet() {
   $('sheetTitle').textContent = d.title;
   $('dramaTag').textContent = `Reporte del día ${n}`;
   $('dramaText').textContent = d.text;
-  sheet.dataset.level = d.level;
+  sheet.dataset.alarm = d.from >= 4 ? '1' : '0';
   lastFocus = document.activeElement;
   scrim.classList.add('open');
   scrim.setAttribute('aria-hidden', 'false');
@@ -963,15 +997,14 @@ function setupFreed() {
   $('liveText').textContent = 'LIBERADO';
   $('live').querySelector('i').style.cssText = 'background:#30d158;box-shadow:0 0 8px rgba(48,209,88,.8)';
   $('daysLabel').textContent = 'Estuvo encerrado';
-  $('days').innerHTML = `${dayNumber()}<small>${dayNumber() === 1 ? 'día' : 'días'}</small>`;
   $('ransom').innerHTML = '<span class="paid">Pagado</span>';
   $('ransomFoot').textContent = '✓ Gracias, Mamá 💙';
-  $('o2Label').textContent = 'Oxígeno';
-  $('o2Pct').textContent = 'O₂ 100%';
-  $('countdown').style.display = 'none';
-  $('o2Fill').style.transform = 'scaleX(1)';
-  $('o2Fill').dataset.level = 'full';
-  $('o2Foot').textContent = 'Respira tranquilo: ya está libre.';
+  $('mood').textContent = 'Feliz y libre 🤩';
+  $('moodPct').textContent = '100%';
+  $('next').style.display = 'none';
+  $('moodFill').style.transform = 'scaleX(1)';
+  $('moodFill').dataset.level = 'full';
+  $('moodFoot').textContent = 'Respira tranquilo: ya está libre.';
   $('message').textContent = FREED_TEXT.message;
   $('chipText').innerHTML = '<b style="color:var(--text-2);font-weight:600">Celda 01 · Abierta</b> — ver otra vez';
   $('ctaText').textContent = 'Ver el rescate otra vez';

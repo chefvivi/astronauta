@@ -3,7 +3,7 @@
 Hay un astronauta azul encerrado en una celda con un candado rojo.
 Solo una persona tiene la llave: **mi mamá**. Y la única forma de liberarlo es comprarlo.
 
-Hice esta mini app para convencer a mi mamá de que me regale la *Minifigura Gigante de Astronauta Azul* (#40921). Ella la instala en su celular y cada día el "Centro de Control" le recuerda que el astronauta sigue encerrado… hasta que lo libere.
+Hice esta mini app para convencer a mi mamá de que me regale la *Minifigura Gigante de Astronauta Azul* (#40921). Ella la instala en su celular y cada día el "Centro de Control" le recuerda que el astronauta sigue encerrado. Cada día que pasa suma un día más de encierro y él se pone más desesperado… hasta que lo libere.
 
 **App:** https://chefvivi.github.io/astronauta/
 
@@ -15,10 +15,11 @@ Hice esta mini app para convencer a mi mamá de que me regale la *Minifigura Gig
 - **Animaciones del espacio a 60 fps:** estrellas con parallax en tres capas que brillan al azar, estrellas fugaces, una luna que rota lento al fondo y el astronauta flotando en gravedad cero. Si el celular tiene activado "Reducir movimiento", las animaciones se apagan.
 - **El candado:** al tocarlo se sacude, el celular vibra (en Android) y aparece el aviso *"Candado bloqueado: solo se abre con una compra autorizada por Mamá"*. El reporte se pone más dramático conforme pasan los días.
 - **Tarjetas en vivo:**
-  - **Días encerrado**, contando desde el 23/11/2026.
+  - **Días encerrado:** el 23/11/2026 es el día 1 y cada medianoche (hora de Monterrey) se suma otro día, sin fecha límite.
   - **Rescate:** $1,399 MXN.
-  - **Oxígeno hasta Black Friday:** cuenta regresiva (días, horas, minutos, segundos) al 27/11/2026 a las 00:00 de Monterrey, con una barra que se va vaciando.
-- **Mensaje del astronauta:** un mensaje distinto cada día (rotan 10).
+  - **Ánimo del astronauta:** baja cada día (Tranquilo → Aburrido → Extraña a su familia → Triste → Desesperado → SOS), con una barra que se va vaciando y cambia de color.
+  - **Otro día encerrado en:** cuenta regresiva (horas, minutos, segundos) hasta la siguiente medianoche.
+- **Mensaje del astronauta:** uno distinto cada día y cada vez más desesperado: quiere salir, ver a su familia, tener con quién jugar y con quién hablar, explorar. Después del día 14 se repiten los más dramáticos.
 - **Botón "Liberar al astronauta":** abre la página del producto.
 - **Modo liberado:** con `?liberado=1` los barrotes se abren, el candado se cae, el astronauta sale volando y hay confeti de estrellas. Es para enseñárselo a mi mamá el día que me lo compre:
   https://chefvivi.github.io/astronauta/?liberado=1
