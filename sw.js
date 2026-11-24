@@ -1,5 +1,5 @@
 // Service worker de Astronauta: guarda la app para que abra rápido y sin internet.
-const VERSION = 'astronauta-v2';
+const VERSION = 'astronauta-v3';
 const SHELL = [
   './',
   './index.html',
