@@ -35,6 +35,8 @@ El astronauta es una ilustración original en SVG (casco redondo, visor oscuro y
 | `manifest.json` | Hace que se pueda instalar como app (nombre, íconos, colores) |
 | `sw.js` | Service worker: guarda la app para que abra rápido y sin internet |
 | `icons/` | Íconos originales (192, 512, maskable, apple-touch-icon y SVG) |
+| `.github/workflows/alerta-astronauta.yml` | La alerta diaria por ntfy |
+| `ios/` | La versión nativa en SwiftUI |
 
 ## Cómo instalarla
 
@@ -66,6 +68,41 @@ Para que mi mamá vea al astronauta seguido, cada mañana le llega una alerta de
 1. Instala **ntfy** desde la App Store (iPhone) o Play Store (Android).
 2. Ábrela, toca **+**, escribe el nombre del tema y toca **Subscribe** (con el servidor `ntfy.sh`, que viene por defecto).
 3. Cuando lo pida, permite las notificaciones.
+
+## Versión nativa para iPhone (SwiftUI)
+
+En la carpeta [`ios/`](ios/) está la misma app hecha en **SwiftUI** (estoy aprendiendo Swift). Tiene el mismo diseño y las mismas animaciones:
+
+- Cielo con estrellas en tres capas que brillan y estrellas fugaces (`Canvas` + `TimelineView`) y una luna que rota lento.
+- El astronauta dibujado con `Canvas`, flotando en gravedad cero dentro de la celda.
+- El candado se sacude (`keyframeAnimator`), el iPhone vibra (`sensoryFeedback`) y sale la hoja con el reporte del día.
+- Tarjetas de vidrio (`.ultraThinMaterial`) con los días encerrado, el rescate, el ánimo y la cuenta regresiva para el siguiente día.
+- El mensaje del astronauta, la historia de bienvenida de 7 capítulos y el modo liberado con confeti de estrellas.
+- **Notificaciones locales** con `UNUserNotificationCenter` todos los días a las **11:30 a. m. de Monterrey**, cada día con su mensaje (las mismas 7 de ntfy). Se programan 60 días por adelantado y se vuelven a programar cada vez que se abre la app. No necesitan internet. Hay un botón **Probar notificación** que manda una en 5 segundos.
+- Truco: mantener presionado 1 segundo el texto *"Misión diseñada por Vivi"* cambia al modo liberado. También se puede abrir con el argumento `-liberado YES`.
+
+| Archivo | Qué tiene |
+|---|---|
+| `AstronautaApp.swift` | Punto de entrada de la app |
+| `ContentView.swift` | La pantalla principal, las tarjetas y la hoja del candado |
+| `CeldaView.swift` | La celda, los barrotes, el candado y la animación de liberación |
+| `AstronautaView.swift` | El dibujo del astronauta (por piezas) |
+| `HistoriaView.swift` | La historia de bienvenida |
+| `Cielo.swift` | Estrellas, estrellas fugaces y luna |
+| `ConfetiView.swift` | Confeti de estrellas |
+| `Mision.swift` | Fechas, días de encierro, mensajes y ánimo |
+| `Notificaciones.swift` | Notificaciones diarias |
+| `Estilo.swift` | Colores y el estilo de vidrio |
+
+### Instalarla en mi iPhone con Xcode (Apple ID gratis)
+1. Abre `ios/Astronauta.xcodeproj` en Xcode.
+2. En **Xcode → Settings → Accounts**, toca **+** y agrega tu Apple ID.
+3. Selecciona el proyecto **Astronauta** → target **Astronauta** → **Signing & Capabilities** → en **Team** elige tu nombre (*Personal Team*). Si dice que el Bundle Identifier ya está ocupado, cámbialo (por ejemplo `com.tunombre.astronauta`).
+4. Conecta el iPhone con cable, desbloquéalo y toca **Confiar**.
+5. En el iPhone activa **Ajustes → Privacidad y seguridad → Modo de desarrollador** (se reinicia).
+6. En Xcode elige tu iPhone arriba y dale **▶︎ Run**.
+7. Si al abrirla dice que el desarrollador no es de confianza: **Ajustes → General → VPN y gestión de dispositivos →** tu Apple ID **→ Confiar**.
+8. Con un Apple ID gratis la app dura 7 días; después solo vuelve a darle **Run** desde Xcode.
 
 ## Hosting (GitHub Pages)
 
