@@ -53,14 +53,14 @@ El astronauta es una ilustración original en SVG (casco redondo, visor oscuro y
 
 Para que mi mamá vea al astronauta seguido, cada mañana le llega una alerta del "Centro de Control". No llega desde mi número ni con mi nombre: llega por **ntfy**, una app gratis de notificaciones.
 
-- Un GitHub Action ([`.github/workflows/alerta-astronauta.yml`](.github/workflows/alerta-astronauta.yml)) corre **todos los días a las 9:00 a. m. de Monterrey** (15:00 UTC) y manda un `POST` a `https://ntfy.sh/$NTFY_TOPIC`.
+- Un GitHub Action ([`.github/workflows/alerta-astronauta.yml`](.github/workflows/alerta-astronauta.yml)) corre **todos los días a las 11:30 a. m. de Monterrey** (17:30 UTC) y manda un `POST` a `https://ntfy.sh/$NTFY_TOPIC`.
 - El nombre del tema va en el secret **`NTFY_TOPIC`** del repo, así que no aparece en el código. Es un nombre largo y difícil de adivinar.
 - Cada alerta trae:
   - un título y un mensaje que rotan entre **7 variantes** (una dice el número de día de encierro),
   - prioridad alta, la etiqueta 🚀 y el ícono del astronauta,
   - al tocarla se abre la app, y en Android trae el botón **Liberar al astronauta**.
 - **Para mandar una de prueba:** en GitHub, *Actions → Alerta del astronauta → Run workflow*. Ahí se puede elegir qué mensaje mandar (1 a 7) o dejarlo vacío para mandar el del día.
-- GitHub a veces retrasa unos minutos las tareas programadas, así que la alerta puede llegar un poquito después de las 9:00.
+- GitHub a veces retrasa unos minutos las tareas programadas, así que la alerta puede llegar un poquito después de las 11:30.
 
 ### Cómo suscribirse
 1. Instala **ntfy** desde la App Store (iPhone) o Play Store (Android).
