@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var escribiendo = true
     @State private var suplica = 0
     @State private var cambioModo = 0
+    @State private var mostrarCentro = false
 
     private static let suplicas = ["¡Sácame de aquí! 🥺", "Psst… la llave la tiene Mamá", "Sigo aquí. Flotando. Esperando.", "Hola, Mamá 👋", "¿Ya viste el candado rojo?"]
 
@@ -284,6 +285,17 @@ struct ContentView: View {
                     cambioModo += 1
                     if liberado { repetirLiberacion() }
                 }
+            Button { mostrarCentro = true } label: {
+                Label("Centro de Control · mandar alerta", systemImage: "antenna.radiowaves.left.and.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .frame(height: 40)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .overlay(Capsule().strokeBorder(.white.opacity(0.1)))
+            }
+            .buttonStyle(Presionable())
+            .sheet(isPresented: $mostrarCentro) { CentroDeControlView() }
             HStack(spacing: 18) {
                 Button("▶︎ Ver la historia") { mostrarHistoria = true }
                 Button("🔔 Probar notificación") {

@@ -79,6 +79,7 @@ En la carpeta [`ios/`](ios/) está la misma app hecha en **SwiftUI** (estoy apre
 - Tarjetas de vidrio (`.ultraThinMaterial`) con los días encerrado, el rescate, el ánimo y la cuenta regresiva para el siguiente día.
 - El mensaje del astronauta, la historia de bienvenida de 7 capítulos y el modo liberado con confeti de estrellas.
 - **Notificaciones locales** con `UNUserNotificationCenter` todos los días a las **11:30 a. m. de Monterrey**, cada día con su mensaje (las mismas 7 de ntfy). Se programan 60 días por adelantado y se vuelven a programar cada vez que se abre la app. No necesitan internet. Hay un botón **Probar notificación** que manda una en 5 segundos.
+- **Centro de Control:** un panel (botón *Centro de Control · mandar alerta*, al final de la app) para mandarle a mi mamá una alerta por ntfy **cuando yo quiera**, además de la de las 11:30. Puedo elegir uno de los mensajes listos o escribir el mío, mandarla ahorita o **programarla** para otra hora (hasta 3 días después), y probarla primero en mi tema de prueba. Antes de mandarla a mi mamá pide confirmación.
 - Truco: mantener presionado 1 segundo el texto *"Misión diseñada por Vivi"* cambia al modo liberado. También se puede abrir con el argumento `-liberado YES`.
 
 | Archivo | Qué tiene |
@@ -92,7 +93,20 @@ En la carpeta [`ios/`](ios/) está la misma app hecha en **SwiftUI** (estoy apre
 | `ConfetiView.swift` | Confeti de estrellas |
 | `Mision.swift` | Fechas, días de encierro, mensajes y ánimo |
 | `Notificaciones.swift` | Notificaciones diarias |
+| `CentroDeControlView.swift` | Panel para mandar alertas a mano o programadas |
+| `Ntfy.swift` | Envía las alertas a ntfy y lee los temas de `Secretos.plist` |
 | `Estilo.swift` | Colores y el estilo de vidrio |
+
+Los nombres de los temas de ntfy van en `ios/Astronauta/Secretos.plist`, que **no se sube a GitHub** (está en `.gitignore`). Si no existe, los temas se pueden escribir a mano en el Centro de Control. Formato:
+
+```xml
+<dict>
+	<key>temaMama</key>
+	<string>tema-de-mama</string>
+	<key>temaPrueba</key>
+	<string>tema-de-prueba</string>
+</dict>
+```
 
 ### Instalarla en mi iPhone con Xcode (Apple ID gratis)
 1. Abre `ios/Astronauta.xcodeproj` en Xcode.

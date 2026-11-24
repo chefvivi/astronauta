@@ -6,3 +6,4 @@ DerivedData/
 .claude/launch.json
 *.local.txt
 ios/build/
+ios/Astronauta/Secretos.plist
