@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="28%" r="85%">
+      <stop offset="0" stop-color="#1c2b6e"/>
+      <stop offset=".55" stop-color="#0a0f2b"/>
+      <stop offset="1" stop-color="#03040b"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#3d7bff" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#3d7bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="helmet" cx="34%" cy="26%" r="80%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".6" stop-color="#e3e9f5"/>
+      <stop offset="1" stop-color="#a9b5cc"/>
+    </radialGradient>
+    <linearGradient id="visor" x1="0" y1="0" x2=".3" y2="1">
+      <stop offset="0" stop-color="#2b3c6b"/>
+      <stop offset=".55" stop-color="#0c1226"/>
+      <stop offset="1" stop-color="#05070f"/>
+    </linearGradient>
+    <linearGradient id="suit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4d86ff"/>
+      <stop offset="1" stop-color="#1d4fd6"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3c4457"/>
+      <stop offset=".45" stop-color="#d7deea"/>
+      <stop offset="1" stop-color="#4a5367"/>
+    </linearGradient>
+    <linearGradient id="lock" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff6b61"/>
+      <stop offset="1" stop-color="#d70015"/>
+    </linearGradient>
+    <linearGradient id="shackle" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8d96a8"/>
+      <stop offset=".5" stop-color="#eef1f6"/>
+      <stop offset="1" stop-color="#8d96a8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <g fill="#fff">
+    <circle cx="170" cy="190" r="5" opacity=".8"/>
+    <circle cx="260" cy="120" r="3" opacity=".5"/>
+    <circle cx="840" cy="170" r="6" opacity=".9"/>
+    <circle cx="900" cy="300" r="3" opacity=".5"/>
+    <circle cx="120" cy="420" r="3" opacity=".45"/>
+    <circle cx="760" cy="90" r="3" opacity=".6"/>
+    <circle cx="930" cy="560" r="4" opacity=".55"/>
+    <circle cx="90" cy="700" r="4" opacity=".5"/>
+    <circle cx="210" cy="880" r="3" opacity=".45"/>
+    <circle cx="860" cy="900" r="3" opacity=".45"/>
+  </g>
+  <circle cx="512" cy="520" r="400" fill="url(#glow)"/>
+
+  <!-- astronauta (cuerpo) -->
+  <rect x="342" y="640" width="340" height="520" rx="130" fill="url(#suit)"/>
+  <ellipse cx="512" cy="660" rx="150" ry="36" fill="#c4cee3"/>
+  <!-- casco -->
+  <circle cx="512" cy="460" r="232" fill="url(#helmet)"/>
+  <ellipse cx="524" cy="472" rx="170" ry="138" fill="url(#visor)" stroke="#9aa6bf" stroke-width="12"/>
+  <path d="M410 400 Q460 350 548 360" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="610" cy="392" r="13" fill="#fff" fill-opacity=".55"/>
+  <path d="M430 548 Q530 590 626 540" fill="none" stroke="#64d2ff" stroke-opacity=".18" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- barrotes -->
+  <g fill="url(#bar)">
+    <rect x="300" y="150" width="34" height="874" rx="17"/>
+    <rect x="690" y="150" width="34" height="874" rx="17"/>
+  </g>
+
+  <!-- candado -->
+  <g transform="translate(676 622) scale(.92)">
+    <path d="M-62 40 V-6 A62 62 0 0 1 62 -6 V40" fill="none" stroke="#5d6577" stroke-width="34" stroke-linecap="round"/>
+    <path d="M-62 40 V-6 A62 62 0 0 1 62 -6 V40" fill="none" stroke="url(#shackle)" stroke-width="26" stroke-linecap="round"/>
+    <rect x="-108" y="26" width="216" height="176" rx="44" fill="url(#lock)"/>
+    <rect x="-90" y="40" width="180" height="40" rx="20" fill="#fff" fill-opacity=".22"/>
+    <circle cx="0" cy="104" r="22" fill="#5a0610"/>
+    <rect x="-10" y="110" width="20" height="50" rx="10" fill="#5a0610"/>
+  </g>
+</svg>

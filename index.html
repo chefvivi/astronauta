@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Astronauta</title>
+<meta name="description" content="Hay un astronauta encerrado. Solo una persona tiene la llave.">
+<meta name="theme-color" content="#04050d">
+<meta name="color-scheme" content="dark">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Astronauta">
+<meta name="format-detection" content="telephone=no">
+
+<!-- Vista previa al compartir el link -->
+<meta property="og:title" content="Hay un astronauta encerrado">
+<meta property="og:description" content="Solo una persona tiene la llave.">
+<meta property="og:image" content="https://chefvivi.github.io/astronauta/icons/icon-512.png">
+<meta property="og:type" content="website">
+
+<!-- Inter como respaldo de SF Pro (Android) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#03040b;
+  --text:#f5f5f7;
+  --text-2:rgba(235,235,245,.64);
+  --text-3:rgba(235,235,245,.40);
+  --stroke:rgba(255,255,255,.10);
+  --blue:#0a84ff;
+  --cyan:#64d2ff;
+  --red:#ff453a;
+  --green:#30d158;
+  --orange:#ff9f0a;
+  --gold:#ffd60a;
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-sheet:cubic-bezier(.32,.72,0,1);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Helvetica Neue",Roboto,system-ui,sans-serif;
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px);
+  --sar:env(safe-area-inset-right,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  font-family:var(--font);color:var(--text);min-height:100vh;min-height:100svh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-tap-highlight-color:transparent;
+  background:
+    radial-gradient(120% 70% at 50% -10%,#121b4a 0%,rgba(18,27,74,0) 60%),
+    linear-gradient(180deg,#060818 0%,#03040b 70%);
+  background-attachment:fixed;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:12px}
+
+/* ---------- Fondo: nebulosa, estrellas, planeta ---------- */
+.nebula{position:fixed;inset:-20%;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(38% 28% at 78% 22%,rgba(94,92,230,.16),transparent 70%),
+    radial-gradient(34% 26% at 18% 58%,rgba(10,132,255,.10),transparent 70%),
+    radial-gradient(30% 22% at 60% 92%,rgba(100,210,255,.06),transparent 70%);
+  animation:drift 70s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate3d(-3%,2%,0) scale(1.04)}}
+#sky,#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#sky{z-index:0}
+#fx{z-index:50}
+
+.planet-wrap{position:fixed;left:-190px;bottom:-190px;z-index:0;pointer-events:none;will-change:transform}
+.planet{position:relative;width:440px;height:440px;border-radius:50%;overflow:hidden;
+  background:radial-gradient(circle at 70% 30%,#8e98b2 0%,#5d6884 38%,#363f5c 70%,#1f2640 100%);
+  box-shadow:0 0 90px 6px rgba(100,140,255,.10);opacity:.5}
+.planet-surface{position:absolute;top:0;left:0;width:200%;height:100%;
+  background-repeat:repeat-x;background-size:50% 100%;
+  animation:spin 260s linear infinite;will-change:transform}
+@keyframes spin{to{transform:translate3d(-50%,0,0)}}
+.planet::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background:
+    radial-gradient(circle at 72% 26%,rgba(255,255,255,.16) 0%,transparent 32%),
+    radial-gradient(circle at 74% 26%,transparent 34%,rgba(3,4,11,.55) 64%,rgba(3,4,11,.94) 82%);
+  box-shadow:inset -10px 12px 26px rgba(170,195,255,.22)}
+
+/* ---------- Layout ---------- */
+.app{position:relative;z-index:1;max-width:460px;margin:0 auto;
+  padding:calc(var(--sat) + 14px) calc(var(--sar) + 20px) calc(var(--sab) + 32px) calc(var(--sal) + 20px)}
+
+.reveal{opacity:0;transform:translate3d(0,14px,0);animation:rise .9s var(--ease-out) forwards;animation-delay:calc(var(--i,0) * 70ms + 80ms)}
+@keyframes rise{to{opacity:1;transform:none}}
+
+/* ---------- Encabezado ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;height:44px}
+.brand{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;letter-spacing:.01em;color:var(--text-2)}
+.brand svg{width:18px;height:18px;color:var(--text)}
+.brand b{color:var(--text);font-weight:600}
+.live{display:flex;align-items:center;gap:7px;height:26px;padding:0 11px 0 9px;border-radius:99px;
+  font-size:11px;font-weight:700;letter-spacing:.09em;color:rgba(255,255,255,.86);
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.live i{position:relative;width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px rgba(255,69,58,.8)}
+.live i::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--red);opacity:0;animation:ping 2.4s var(--ease-out) infinite}
+@keyframes ping{0%{transform:scale(.4);opacity:.7}80%,100%{transform:scale(1.6);opacity:0}}
+
+/* ---------- Hero ---------- */
+.hero{text-align:center;margin-top:26px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);opacity:.9}
+h1{margin-top:10px;font-size:clamp(31px,8.8vw,42px);line-height:1.06;font-weight:700;letter-spacing:-.035em;
+  background:linear-gradient(180deg,#fff 0%,#c8d2ea 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  transition:opacity .35s ease,transform .35s ease}
+.sub{margin-top:10px;font-size:17px;line-height:1.4;color:var(--text-2);letter-spacing:-.01em;transition:opacity .35s ease}
+.swap-out{opacity:0!important;transform:translate3d(0,6px,0)}
+html.freed h1{background:linear-gradient(100deg,#ffe58a 0%,#fff 45%,#9fe3ff 100%);-webkit-background-clip:text;background-clip:text}
+
+/* ---------- Celda ---------- */
+.stage{position:relative;display:flex;flex-direction:column;align-items:center;margin-top:18px}
+.chamber{position:relative;width:min(80vw,320px);aspect-ratio:320/360}
+.chamber::before{content:"";position:absolute;inset:-18% -22%;z-index:-1;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(61,123,255,.30),rgba(61,123,255,.08) 55%,transparent);
+  animation:breathe 6s ease-in-out infinite}
+html.freed .chamber::before{background:radial-gradient(closest-side,rgba(255,214,10,.28),rgba(100,210,255,.10) 55%,transparent)}
+@keyframes breathe{50%{opacity:.7;transform:scale(.96)}}
+.chamber svg{width:100%;height:100%;overflow:visible;display:block}
+
+.astro-fly,.astro-float,.astro-bump,.astro-spin,.wave,.lock-fall,.lock-sway,.lock-shake,.shackle,.shadow,.door-l,.door-r,.ring,.led{
+  transform-box:view-box;transform-origin:0 0}
+.astro-float{animation:float 6.5s ease-in-out infinite}
+.astro-spin{animation:tilt 10s ease-in-out infinite}
+.shadow{animation:shadow 6.5s ease-in-out infinite}
+.wave{animation:idleArm 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translate3d(0,-7px,0)}50%{transform:translate3d(0,7px,0)}}
+@keyframes tilt{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg)}}
+@keyframes shadow{0%,100%{transform:scale(.82);opacity:.45}50%{transform:scale(1.04);opacity:.8}}
+@keyframes idleArm{0%,100%{transform:rotate(0)}50%{transform:rotate(-9deg)}}
+
+.lock-hit{cursor:pointer;outline:none}
+.lock-sway{animation:sway 4.2s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(2.2deg)}50%{transform:rotate(-2.2deg)}}
+.lock-shake{transition:transform .2s var(--ease-out)}
+.lock-shake.shake{animation:shake .55s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{
+  10%{transform:rotate(-16deg)}25%{transform:rotate(14deg)}40%{transform:rotate(-11deg)}
+  55%{transform:rotate(8deg)}70%{transform:rotate(-5deg)}85%{transform:rotate(2deg)}100%{transform:rotate(0)}}
+.lock-hit:active .lock-body{filter:brightness(1.12)}
+.ring{animation:ring 2.6s var(--ease-out) infinite}
+@keyframes ring{0%{transform:scale(.7);opacity:.75}75%,100%{transform:scale(1.55);opacity:0}}
+.led{animation:led 2.2s ease-in-out infinite}
+@keyframes led{50%{opacity:.35}}
+
+.bump{animation:bump .6s var(--ease-out)}
+@keyframes bump{30%{transform:scale(1.08) rotate(-8deg)}60%{transform:scale(.97) rotate(4deg)}}
+
+/* Liberado */
+.free-glow{opacity:0;transition:opacity 1.6s ease 1.2s}
+html.freed .free-glow{opacity:1}
+html.freed .ring{display:none}
+html.freed .led-red{opacity:0;animation:none}
+.led-green{opacity:0}
+html.freed .led-green{opacity:1}
+html.freed .shackle{animation:shackleUp .35s .35s var(--ease-out) forwards}
+html.freed .lock-fall{animation:lockFall 1.1s .8s cubic-bezier(.55,0,.85,.35) forwards}
+html.freed .door-l{animation:doorL 1.4s 1.15s var(--ease-out) forwards}
+html.freed .door-r{animation:doorR 1.4s 1.15s var(--ease-out) forwards}
+html.freed .astro-fly{animation:flyOut 3.4s 2.1s cubic-bezier(.45,0,.25,1) forwards}
+html.freed .wave{animation:waveHi .9s 5.6s ease-in-out 4 both}
+@keyframes shackleUp{to{transform:translate3d(0,-9px,0)}}
+@keyframes lockFall{to{transform:translate3d(0,150px,0) rotate(38deg);opacity:0}}
+@keyframes doorL{to{transform:translate3d(-158px,0,0)}}
+@keyframes doorR{to{transform:translate3d(158px,0,0)}}
+@keyframes flyOut{
+  0%{transform:translate3d(0,0,0) rotate(0) scale(1)}
+  14%{transform:translate3d(0,10px,0) rotate(-4deg) scale(.95)}
+  46%{transform:translate3d(46px,-430px,0) rotate(32deg) scale(.6);opacity:1}
+  47%{opacity:0}
+  52%{transform:translate3d(-40px,-360px,0) rotate(-24deg) scale(.75);opacity:0}
+  56%{opacity:1}
+  100%{transform:translate3d(0,-8px,0) rotate(0) scale(1.1);opacity:1}}
+@keyframes waveHi{0%,100%{transform:rotate(0)}50%{transform:rotate(-34deg)}}
+
+.chip{margin-top:14px;display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px 0 12px;border-radius:99px;
+  font-size:13px;font-weight:600;color:var(--text-2);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  transition:transform .25s var(--ease-out),background .25s}
+.chip:active{transform:scale(.96);background:rgba(255,255,255,.1)}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px rgba(255,69,58,.7)}
+.chip span{color:var(--text-3);font-weight:500}
+html.freed .chip i{background:var(--green);box-shadow:0 0 8px rgba(48,209,88,.7)}
+
+/* ---------- Tarjetas (vidrio) ---------- */
+.glass{position:relative;border-radius:26px;
+  background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.035));
+  border:1px solid rgba(255,255,255,.09);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 24px 48px -24px rgba(0,0,0,.65)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.card{padding:16px 16px 16px;min-width:0}
+.card.wide{grid-column:1/-1}
+.label{display:flex;align-items:center;gap:6px;white-space:nowrap;min-width:0;font-size:13px;font-weight:600;color:var(--text-2);letter-spacing:-.005em}
+.label svg{width:15px;height:15px;flex:none;color:var(--text-3)}
+.value{margin-top:10px;font-size:40px;line-height:1;font-weight:700;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.value small{font-size:15px;font-weight:600;letter-spacing:0;color:var(--text-3);margin-left:4px}
+.foot{margin-top:8px;font-size:12px;color:var(--text-3);letter-spacing:.005em}
+.paid{color:var(--green);font-size:34px;letter-spacing:-.035em;white-space:nowrap}
+.head-row{display:flex;justify-content:space-between;align-items:center}
+.pct{font-size:13px;font-weight:600;color:var(--text-2);font-variant-numeric:tabular-nums}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);margin-top:12px}
+.unit{display:flex;flex-direction:column;align-items:flex-start}
+.unit b{font-size:32px;line-height:1;font-weight:600;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.unit span{margin-top:5px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.bf-now{display:none;margin-top:12px;font-size:26px;font-weight:700;letter-spacing:-.03em;
+  background:linear-gradient(90deg,#ffb340,#ff453a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card.ended .countdown{display:none}
+.card.ended .bf-now{display:block}
+.bar{position:relative;height:8px;margin-top:14px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar-fill{position:absolute;inset:0;border-radius:inherit;transform-origin:left center;
+  background:linear-gradient(90deg,#3d7bff,var(--cyan));transition:transform .9s var(--ease-out),background .6s}
+.bar-fill::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:translate3d(-100%,0,0);animation:shimmer 3.2s ease-in-out infinite}
+@keyframes shimmer{60%,100%{transform:translate3d(100%,0,0)}}
+.bar-fill[data-level="low"]{background:linear-gradient(90deg,#ff9f0a,#ffd60a)}
+.bar-fill[data-level="crit"]{background:linear-gradient(90deg,#ff453a,#ff9f0a)}
+.bar-fill[data-level="full"]{background:linear-gradient(90deg,#30d158,#64d2ff)}
+
+/* ---------- Chat ---------- */
+.chat{margin-top:22px}
+.chat-meta{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--text-3);letter-spacing:.01em;padding-left:4px}
+.chat-meta svg{width:22px;height:22px}
+.chat-meta b{color:var(--text-2);font-weight:600}
+.bubble{position:relative;margin-top:8px;margin-right:36px;padding:13px 16px;min-height:46px;
+  border-radius:22px 22px 22px 7px;font-size:16px;line-height:1.42;letter-spacing:-.01em;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.07));
+  border:1px solid rgba(255,255,255,.09);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%)}
+.bubble p{transition:opacity .45s ease,transform .45s var(--ease-out)}
+.bubble.typing p{opacity:0;transform:translate3d(0,4px,0)}
+.dots{position:absolute;left:16px;top:50%;display:flex;gap:5px;transform:translateY(-50%);opacity:0;transition:opacity .3s}
+.bubble.typing .dots{opacity:1}
+.dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.55);animation:dot 1.2s ease-in-out infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-4px);opacity:1}}
+
+/* ---------- Botón principal ---------- */
+.cta{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;height:58px;margin-top:28px;border-radius:20px;
+  font-size:17px;font-weight:600;letter-spacing:-.01em;color:#fff;overflow:hidden;
+  background:linear-gradient(180deg,#2f8fff 0%,#0a6cff 100%);
+  box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 12px 32px -10px rgba(10,132,255,.75);
+  transition:transform .22s var(--ease-out),box-shadow .22s,filter .22s}
+.cta svg{width:20px;height:20px}
+.cta::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-18deg);
+  animation:sweep 5s ease-in-out 2.4s infinite}
+@keyframes sweep{0%{left:-60%}30%,100%{left:130%}}
+.cta:active{transform:scale(.97);filter:brightness(.95)}
+html.freed .cta{background:linear-gradient(180deg,#3ddc6e 0%,#20b14b 100%);box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 12px 32px -10px rgba(48,209,88,.6)}
+.cta-note{margin-top:10px;text-align:center;font-size:12px;color:var(--text-3)}
+
+footer{margin-top:36px;text-align:center;font-size:12px;color:var(--text-3);letter-spacing:.01em}
+footer b{color:var(--text-2);font-weight:600}
+
+/* ---------- Hoja modal ---------- */
+.scrim{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;
+  padding:0 calc(var(--sar) + 10px) calc(var(--sab) + 10px) calc(var(--sal) + 10px);
+  background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s linear .45s}
+.scrim.open{opacity:1;visibility:visible;transition:opacity .35s ease}
+.sheet{width:100%;max-width:440px;padding:10px 22px 18px;border-radius:34px;text-align:center;
+  background:linear-gradient(180deg,rgba(40,44,62,.78),rgba(22,24,36,.86));
+  border:1px solid rgba(255,255,255,.1);
+  -webkit-backdrop-filter:blur(40px) saturate(180%);backdrop-filter:blur(40px) saturate(180%);
+  box-shadow:0 30px 80px -20px rgba(0,0,0,.8);
+  transform:translate3d(0,110%,0);transition:transform .5s var(--ease-sheet)}
+.scrim.open .sheet{transform:none}
+.grabber{width:36px;height:5px;margin:0 auto 18px;border-radius:99px;background:rgba(255,255,255,.22)}
+.sheet-icon{width:64px;height:64px;margin:4px auto 0;display:grid;place-items:center;border-radius:20px;
+  background:linear-gradient(180deg,rgba(255,69,58,.22),rgba(255,69,58,.10));border:1px solid rgba(255,69,58,.28)}
+.sheet-icon svg{width:34px;height:34px}
+.sheet[data-level="3"] .sheet-icon,.sheet[data-level="4"] .sheet-icon,.sheet[data-level="5"] .sheet-icon,.sheet[data-level="6"] .sheet-icon{animation:alarm 1.6s ease-in-out infinite}
+@keyframes alarm{50%{box-shadow:0 0 0 8px rgba(255,69,58,.12),0 0 34px rgba(255,69,58,.45)}}
+.sheet h2{margin-top:16px;font-size:22px;font-weight:700;letter-spacing:-.025em}
+.sheet .msg{margin-top:8px;font-size:16px;line-height:1.42;color:var(--text-2)}
+.sheet .msg b{color:var(--text);font-weight:600}
+.drama{margin-top:14px;padding:12px 14px;border-radius:16px;font-size:14px;line-height:1.45;color:rgba(255,214,204,.92);
+  background:rgba(255,69,58,.08);border:1px solid rgba(255,69,58,.16);text-align:left}
+.drama b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#ff8a80;margin-bottom:3px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:54px;border-radius:18px;
+  font-size:17px;font-weight:600;letter-spacing:-.01em;transition:transform .2s var(--ease-out),background .2s}
+.btn:active{transform:scale(.97)}
+.btn svg{width:19px;height:19px}
+.btn-primary{margin-top:20px;color:#fff;background:linear-gradient(180deg,#2f8fff,#0a6cff);box-shadow:0 10px 26px -10px rgba(10,132,255,.8)}
+.btn-ghost{margin-top:8px;color:var(--cyan);background:rgba(255,255,255,.06)}
+
+/* ---------- Toast e instalación ---------- */
+.toast{position:fixed;left:50%;top:calc(var(--sat) + 12px);z-index:70;max-width:calc(100% - 40px);
+  padding:12px 18px;border-radius:99px;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  background:rgba(40,44,62,.72);border:1px solid rgba(255,255,255,.1);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
+  box-shadow:0 14px 40px -12px rgba(0,0,0,.7);
+  transform:translate3d(-50%,-140%,0);opacity:0;transition:transform .5s var(--ease-sheet),opacity .3s}
+.toast.show{transform:translate3d(-50%,0,0);opacity:1}
+.install{position:fixed;left:50%;bottom:calc(var(--sab) + 14px);z-index:55;width:min(440px,calc(100% - 24px));
+  display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border-radius:22px;
+  background:rgba(34,38,54,.78);border:1px solid rgba(255,255,255,.1);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
+  box-shadow:0 18px 50px -14px rgba(0,0,0,.8);
+  transform:translate3d(-50%,160%,0);transition:transform .55s var(--ease-sheet)}
+.install.show{transform:translate3d(-50%,0,0)}
+body.has-install .app{padding-bottom:calc(var(--sab) + 110px)}
+.install img{width:40px;height:40px;border-radius:10px;flex:none}
+.install p{flex:1;font-size:13px;line-height:1.35;color:var(--text-2)}
+.install p b{display:block;color:var(--text);font-size:14px}
+.install .go{height:34px;padding:0 14px;border-radius:99px;font-size:14px;font-weight:600;background:var(--blue);color:#fff}
+.install .x{width:30px;height:30px;border-radius:50%;font-size:18px;line-height:1;color:var(--text-3)}
+
+@media (min-width:700px){
+  .app{padding-top:calc(var(--sat) + 28px)}
+  .planet-wrap{left:-120px;bottom:-140px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.001ms!important}
+  .reveal{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="nebula" aria-hidden="true"></div>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="planet-wrap" id="planetWrap" aria-hidden="true"><div class="planet"><div class="planet-surface" id="planetSurface"></div></div></div>
+
+<main class="app">
+  <header class="topbar reveal" style="--i:0">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5" opacity=".6"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>
+      <span><b>Centro de Control</b> · MTY</span>
+    </div>
+    <div class="live" id="live"><i></i><span id="liveText">EN VIVO</span></div>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow reveal" style="--i:1" id="eyebrow">Misión · Día 1</p>
+    <h1 class="reveal" style="--i:2" id="title">Hay un astronauta encerrado</h1>
+    <p class="sub reveal" style="--i:3" id="subtitle">Solo una persona tiene la llave.</p>
+  </section>
+
+  <section class="stage reveal" style="--i:4">
+    <div class="chamber" id="chamber">
+      <svg viewBox="0 0 320 360" role="img" aria-labelledby="cellTitle">
+        <title id="cellTitle">Un astronauta azul flotando detrás de unos barrotes, con un candado rojo</title>
+        <defs>
+          <clipPath id="win"><rect x="24" y="16" width="272" height="328" rx="44"/></clipPath>
+          <radialGradient id="cellBg" cx="50%" cy="40%" r="72%">
+            <stop offset="0" stop-color="#1b2a60"/><stop offset=".55" stop-color="#0b1130"/><stop offset="1" stop-color="#05070f"/>
+          </radialGradient>
+          <radialGradient id="cellFree" cx="50%" cy="45%" r="65%">
+            <stop offset="0" stop-color="#ffd60a" stop-opacity=".32"/><stop offset=".6" stop-color="#64d2ff" stop-opacity=".08"/><stop offset="1" stop-color="#64d2ff" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#9fc0ff" stop-opacity=".16"/><stop offset="1" stop-color="#9fc0ff" stop-opacity="0"/>
+          </linearGradient>
+          <radialGradient id="shadowG"><stop offset="0" stop-color="#000" stop-opacity=".6"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+          <linearGradient id="barG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#363e51"/><stop offset=".45" stop-color="#dbe2ee"/><stop offset=".7" stop-color="#8c96aa"/><stop offset="1" stop-color="#3f475a"/>
+          </linearGradient>
+          <linearGradient id="railG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#d9e0ec"/><stop offset=".5" stop-color="#7f899d"/><stop offset="1" stop-color="#3b4356"/>
+          </linearGradient>
+          <linearGradient id="frameG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#c9d2e2"/><stop offset=".35" stop-color="#5a6378"/><stop offset=".7" stop-color="#9aa4b8"/><stop offset="1" stop-color="#3e465a"/>
+          </linearGradient>
+          <linearGradient id="suitG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5b90ff"/><stop offset="1" stop-color="#1d4fd6"/>
+          </linearGradient>
+          <linearGradient id="limbG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#4d86ff"/><stop offset="1" stop-color="#2254d9"/>
+          </linearGradient>
+          <radialGradient id="helmetG" cx="34%" cy="26%" r="80%">
+            <stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#e3e9f5"/><stop offset="1" stop-color="#a6b2ca"/>
+          </radialGradient>
+          <linearGradient id="visorG" x1="0" y1="0" x2=".3" y2="1">
+            <stop offset="0" stop-color="#2c3d6e"/><stop offset=".55" stop-color="#0c1226"/><stop offset="1" stop-color="#05070f"/>
+          </linearGradient>
+          <linearGradient id="packG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#e4eaf6"/><stop offset="1" stop-color="#97a4c0"/>
+          </linearGradient>
+          <linearGradient id="whiteG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c2cce0"/>
+          </linearGradient>
+          <linearGradient id="lockG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ff6b61"/><stop offset="1" stop-color="#d70015"/>
+          </linearGradient>
+          <linearGradient id="shackleG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#8d96a8"/><stop offset=".5" stop-color="#f0f3f8"/><stop offset="1" stop-color="#8d96a8"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Interior de la celda -->
+        <g clip-path="url(#win)">
+          <rect x="24" y="16" width="272" height="328" fill="url(#cellBg)"/>
+          <rect class="free-glow" x="24" y="16" width="272" height="328" fill="url(#cellFree)"/>
+          <path d="M120 16 L200 16 L250 344 L70 344 Z" fill="url(#beam)"/>
+          <g stroke="#fff" stroke-opacity=".045" stroke-width="1">
+            <path d="M24 118 H296 M24 226 H296 M92 16 V344 M228 16 V344"/>
+          </g>
+          <g fill="#fff">
+            <circle cx="62" cy="40" r="1.1" opacity=".5"/><circle cx="250" cy="52" r="1.3" opacity=".6"/>
+            <circle cx="276" cy="140" r="1" opacity=".4"/><circle cx="44" cy="190" r="1.2" opacity=".45"/>
+            <circle cx="212" cy="30" r=".9" opacity=".4"/><circle cx="110" cy="300" r="1" opacity=".35"/>
+          </g>
+          <ellipse cx="160" cy="330" rx="130" ry="22" fill="#3d7bff" fill-opacity=".10"/>
+          <g transform="translate(160 314)"><ellipse class="shadow" cx="0" cy="0" rx="46" ry="8" fill="url(#shadowG)"/></g>
+        </g>
+
+        <!-- Astronauta (original: casco redondo, visor oscuro, traje azul) -->
+        <g transform="translate(160 166) scale(1.12)">
+          <g class="astro-fly"><g class="astro-float"><g class="astro-bump" id="astroBump"><g class="astro-spin" id="astro">
+            <rect x="-40" y="-12" width="80" height="60" rx="18" fill="url(#packG)"/>
+            <path d="M-14 38 L-17 64" stroke="url(#limbG)" stroke-width="22" stroke-linecap="round"/>
+            <path d="M14 38 L18 62" stroke="url(#limbG)" stroke-width="22" stroke-linecap="round"/>
+            <rect x="-30" y="60" width="26" height="17" rx="8.5" fill="url(#whiteG)"/>
+            <rect x="6" y="58" width="26" height="17" rx="8.5" fill="url(#whiteG)" transform="rotate(-6 19 66)"/>
+            <path d="M-29 6 Q-48 18 -51 38" fill="none" stroke="url(#limbG)" stroke-width="18" stroke-linecap="round"/>
+            <circle cx="-51" cy="41" r="10" fill="url(#whiteG)"/>
+            <rect x="-34" y="-8" width="68" height="56" rx="24" fill="url(#suitG)"/>
+            <rect x="-14" y="5" width="28" height="18" rx="5.5" fill="#e6ecf8"/>
+            <circle cx="-7" cy="14" r="2.6" fill="#ff453a"/><circle cx="0" cy="14" r="2.6" fill="#ffd60a"/><circle cx="7" cy="14" r="2.6" fill="#30d158"/>
+            <g transform="translate(13 29)"><rect width="4" height="8" fill="#006847"/><rect x="4" width="4" height="8" fill="#fff"/><rect x="8" width="4" height="8" fill="#ce1126"/></g>
+            <g transform="translate(29 5)"><g class="wave">
+              <path d="M0 0 Q20 -6 26 -26" fill="none" stroke="url(#limbG)" stroke-width="18" stroke-linecap="round"/>
+              <circle cx="27" cy="-30" r="10" fill="url(#whiteG)"/>
+            </g></g>
+            <ellipse cx="0" cy="-8" rx="25" ry="7.5" fill="#c4cee3"/>
+            <circle cx="0" cy="-44" r="38" fill="url(#helmetG)"/>
+            <circle cx="-37" cy="-44" r="4.5" fill="#aab6cc"/><circle cx="37" cy="-44" r="4.5" fill="#aab6cc"/>
+            <ellipse cx="2" cy="-42" rx="27.5" ry="22.5" fill="url(#visorG)" stroke="#9aa6bf" stroke-width="2.5"/>
+            <path d="M-15 -53 Q-6 -61 8 -59.5" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3.6" stroke-linecap="round"/>
+            <circle cx="14" cy="-53" r="2.2" fill="#fff" fill-opacity=".55"/>
+            <path d="M-13 -30 Q3 -24 18 -32" fill="none" stroke="#64d2ff" stroke-opacity=".22" stroke-width="2.6" stroke-linecap="round"/>
+          </g></g></g></g>
+        </g>
+
+        <!-- Barrotes (dos puertas que se abren) -->
+        <g clip-path="url(#win)">
+          <g class="door-l">
+            <rect x="55" y="8" width="10" height="344" rx="5" fill="url(#barG)"/>
+            <rect x="95" y="8" width="10" height="344" rx="5" fill="url(#barG)"/>
+            <rect x="135" y="8" width="10" height="344" rx="5" fill="url(#barG)"/>
+            <rect x="20" y="62" width="139" height="10" rx="5" fill="url(#railG)"/>
+            <rect x="20" y="266" width="139" height="10" rx="5" fill="url(#railG)"/>
+            <g fill="#eef2f8" fill-opacity=".85"><circle cx="60" cy="67" r="2.6"/><circle cx="100" cy="67" r="2.6"/><circle cx="140" cy="67" r="2.6"/><circle cx="60" cy="271" r="2.6"/><circle cx="100" cy="271" r="2.6"/><circle cx="140" cy="271" r="2.6"/></g>
+          </g>
+          <g class="door-r">
+            <rect x="175" y="8" width="10" height="344" rx="5" fill="url(#barG)"/>
+            <rect x="215" y="8" width="10" height="344" rx="5" fill="url(#barG)"/>
+            <rect x="255" y="8" width="10" height="344" rx="5" fill="url(#barG)"/>
+            <rect x="161" y="62" width="139" height="10" rx="5" fill="url(#railG)"/>
+            <rect x="161" y="266" width="139" height="10" rx="5" fill="url(#railG)"/>
+            <g fill="#eef2f8" fill-opacity=".85"><circle cx="180" cy="67" r="2.6"/><circle cx="220" cy="67" r="2.6"/><circle cx="260" cy="67" r="2.6"/><circle cx="180" cy="271" r="2.6"/><circle cx="220" cy="271" r="2.6"/><circle cx="260" cy="271" r="2.6"/></g>
+          </g>
+        </g>
+
+        <!-- Marco -->
+        <rect x="24" y="16" width="272" height="328" rx="44" fill="none" stroke="url(#frameG)" stroke-width="6"/>
+        <rect x="29" y="21" width="262" height="318" rx="39" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="1"/>
+        <g transform="translate(160 16)">
+          <rect x="-22" y="-5" width="44" height="10" rx="5" fill="#1a1f2e" stroke="#5a6378" stroke-width="1"/>
+          <circle class="led led-red" cx="0" cy="0" r="3" fill="#ff453a"/>
+          <circle class="led-green" cx="0" cy="0" r="3" fill="#30d158" style="transition:opacity .6s ease 1.2s"/>
+        </g>
+
+        <!-- Candado -->
+        <g transform="translate(160 262)">
+          <g class="lock-fall"><g class="lock-sway"><g class="lock-hit" id="lock" role="button" tabindex="0" aria-label="Candado rojo. Toca para intentar abrirlo.">
+            <g class="lock-shake" id="lockShake">
+              <g transform="translate(0 33)"><circle class="ring" r="30" fill="none" stroke="#ff453a" stroke-opacity=".55" stroke-width="2"/></g>
+              <circle cx="0" cy="30" r="38" fill="#000" fill-opacity="0" pointer-events="all"/>
+              <g class="shackle">
+                <path d="M-11 22 V2 A11 11 0 0 1 11 2 V22" fill="none" stroke="#5d6577" stroke-width="7" stroke-linecap="round"/>
+                <path d="M-11 22 V2 A11 11 0 0 1 11 2 V22" fill="none" stroke="url(#shackleG)" stroke-width="5" stroke-linecap="round"/>
+              </g>
+              <g class="lock-body">
+                <rect x="-20" y="16" width="40" height="34" rx="10" fill="url(#lockG)"/>
+                <rect x="-16.5" y="19" width="33" height="7.5" rx="3.75" fill="#fff" fill-opacity=".24"/>
+                <circle cx="0" cy="31" r="4.2" fill="#5a0610"/>
+                <rect x="-1.9" y="32" width="3.8" height="10" rx="1.9" fill="#5a0610"/>
+              </g>
+            </g>
+          </g></g></g>
+        </g>
+      </svg>
+    </div>
+    <button class="chip" id="chip" type="button"><i></i><span id="chipText"><b style="color:var(--text-2);font-weight:600">Celda 01 · Bloqueada</b> — toca el candado</span></button>
+  </section>
+
+  <section class="stats">
+    <article class="glass card reveal" style="--i:5">
+      <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="daysLabel">Días encerrado</span></div>
+      <div class="value" id="days">1</div>
+      <div class="foot">Desde el 23/11/2026</div>
+    </article>
+    <article class="glass card reveal" style="--i:6">
+      <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 12.2V4.8C3 3.8 3.8 3 4.8 3h7.4c.5 0 .9.2 1.3.5l7 7c.7.7.7 1.8 0 2.5l-7.4 7.4c-.7.7-1.8.7-2.5 0l-7-7c-.4-.3-.6-.8-.6-1.2z"/><circle cx="8" cy="8" r="1.5"/></svg><span>Rescate</span></div>
+      <div class="value" id="ransom">$1,399</div>
+      <div class="foot" id="ransomFoot">MXN · una sola vez</div>
+    </article>
+    <article class="glass card wide reveal" style="--i:7" id="o2Card">
+      <div class="head-row">
+        <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/></svg><span id="o2Label">Oxígeno hasta Black Friday</span></div>
+        <span class="pct" id="o2Pct">O₂ 100%</span>
+      </div>
+      <div class="countdown" id="countdown" aria-live="off">
+        <div class="unit"><b id="cdD">00</b><span>días</span></div>
+        <div class="unit"><b id="cdH">00</b><span>horas</span></div>
+        <div class="unit"><b id="cdM">00</b><span>min</span></div>
+        <div class="unit"><b id="cdS">00</b><span>seg</span></div>
+      </div>
+      <div class="bf-now" id="bfNow">Black Friday ya empezó</div>
+      <div class="bar"><div class="bar-fill" id="o2Fill"></div></div>
+      <div class="foot" id="o2Foot">27 nov 2026 · 00:00 hora de Monterrey</div>
+    </article>
+  </section>
+
+  <section class="chat reveal" style="--i:8">
+    <div class="chat-meta">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#e8edf7"/><ellipse cx="12.4" cy="12.4" rx="7.6" ry="6.3" fill="#0e1530" stroke="#9aa6bf" stroke-width="1"/><path d="M7.8 9.6q2.4-2 5.2-1.6" stroke="#fff" stroke-opacity=".6" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
+      <span><b>Mensaje del astronauta</b> · hoy</span>
+    </div>
+    <div class="bubble typing" id="bubble">
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+      <p id="message">…</p>
+    </div>
+  </section>
+
+  <div class="reveal" style="--i:9">
+    <a class="cta" id="cta" href="https://www.lego.com/es-mx/product/up-scaled-blue-astronaut-minifigure-40921" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="ctaIcon"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 20 3M16.5 6.5l3 3M14 9l2 2"/></svg>
+      <span id="ctaText">Liberar al astronauta</span>
+    </a>
+    <p class="cta-note" id="ctaNote">Abre la página del producto · #40921</p>
+  </div>
+
+  <footer class="reveal" style="--i:10">Misión diseñada por <b>Vivi</b> · solo Mamá tiene la llave</footer>
+</main>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<!-- Hoja: candado bloqueado -->
+<div class="scrim" id="scrim" aria-hidden="true">
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="grabber"></div>
+    <div class="sheet-icon">
+      <svg viewBox="0 0 40 40"><path d="M12.5 18v-4a7.5 7.5 0 0 1 15 0v4" fill="none" stroke="#e9edf5" stroke-width="3.2" stroke-linecap="round"/><rect x="8" y="17" width="24" height="18" rx="6" fill="#ff453a"/><circle cx="20" cy="25" r="2.4" fill="#5a0610"/><rect x="19" y="25.5" width="2" height="5" rx="1" fill="#5a0610"/></svg>
+    </div>
+    <h2 id="sheetTitle">Candado bloqueado</h2>
+    <p class="msg">Solo se abre con una <b>compra autorizada por Mamá</b>.</p>
+    <p class="drama" id="drama"><b id="dramaTag">Reporte del día 1</b><span id="dramaText"></span></p>
+    <a class="btn btn-primary" id="useKey" href="https://www.lego.com/es-mx/product/up-scaled-blue-astronaut-minifigure-40921" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3 20 3M16.5 6.5l3 3M14 9l2 2"/></svg>
+      Usar la llave
+    </a>
+    <button class="btn btn-ghost" id="later" type="button">Dejarlo un día más</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="install" id="install" role="dialog" aria-label="Instalar la app">
+  <img src="icons/icon-192.png" alt="">
+  <p id="installText"><b>Instala Astronauta</b>Para recibir la misión como app.</p>
+  <button class="go" id="installGo" type="button" hidden>Instalar</button>
+  <button class="x" id="installX" type="button" aria-label="Cerrar">✕</button>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ================== Datos de la misión ================== */
+const START_DAY = Date.UTC(2026, 10, 23);                  // 23/11/2026 (fecha de Monterrey)
+const O2_START  = Date.parse('2026-11-23T00:00:00-06:00');  // inicio del encierro, hora MTY
+const BLACK_FRIDAY = Date.parse('2026-11-27T00:00:00-06:00');
+const FREED = new URLSearchParams(location.search).get('liberado') === '1';
+
+const MESSAGES = [
+  'Día {n} aquí adentro. Ya conté todas las estrellas que se ven desde la celda. Dos veces.',
+  'Houston, tenemos un problema: sigo encerrado. Houston dice que hable con Mamá.',
+  'Hoy intenté abrir el candado con la mente. Avance: 0%. Creo que sí necesito la llave.',
+  'Aquí no hay gravedad, pero sí mucha esperanza. Floto, espero, vuelvo a flotar. 🥺',
+  'Vivi dice que eres la mejor del universo. Lo verifiqué con el telescopio: es cierto.',
+  'Dato científico: un astronauta liberado es 100% más feliz. Fuente: yo.',
+  'Ya me sé de memoria el camino a la repisa de Vivi. Solo me falta salir de aquí.',
+  'El oxígeno baja, pero mi fe en ti no. Bueno… el oxígeno sí baja un poquito. ⏳',
+  'Le puse nombre a cada barrote. El de en medio se llama "Ya mero".',
+  'Prometo quedarme quietecito en la repisa y no hacer ruido. Palabra de astronauta. 🫡'
+];
+
+const DRAMA = [
+  { from: 1,  title: 'Candado bloqueado',            text: 'El astronauta está tranquilo… por ahora. Dice que confía plenamente en ti.' },
+  { from: 2,  title: 'Candado bloqueado',            text: 'Ya empezó a platicar con su reflejo en el visor. Lo preocupante es que el reflejo le contesta.' },
+  { from: 3,  title: 'Candado bloqueado',            text: 'Le puso nombre a cada barrote. Su favorito se llama Esperanza. Esperanza no dice nada.' },
+  { from: 4,  title: 'Alerta: candado bloqueado',    text: 'Reservas de oxígeno en zona roja. Black Friday es la última ventana de rescate. Repito: la última.' },
+  { from: 5,  title: 'Alerta: candado bloqueado',    text: 'Black Friday ya abrió la escotilla. El astronauta mira la puerta. La puerta lo mira a él. Nadie se mueve.' },
+  { from: 7,  title: 'Emergencia en la celda 01',    text: 'Una semana completa sin salir. El Centro de Control declara emergencia nivel máximo. Todos los ojos están en ti, Mamá.' },
+  { from: 14, title: 'Emergencia en la celda 01',    text: 'Escribió tu nombre con estrellas en la pared. Ya no le quedan estrellas. Solo le queda la llave… que tienes tú.' }
+];
+
+const FREED_TEXT = {
+  eyebrow: 'Misión cumplida',
+  title: '¡Astronauta liberado!',
+  sub: 'Gracias, Mamá. Ya va en camino a casa.',
+  message: '¡SOY LIBRE! 🚀 Gracias, Mamá. Ya voy directo a la repisa de Vivi. Te debo una galaxia entera.'
+};
+
+/* ================== Utilidades ================== */
+const $ = id => document.getElementById(id);
+const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
+let reduced = reduceMQ.matches;
+const pad = n => String(n).padStart(2, '0');
+const vibrate = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (_) {} };
+
+function mtyDate(d = new Date()) {
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(d);
+    const get = t => +parts.find(p => p.type === t).value;
+    return [get('year'), get('month'), get('day')];
+  } catch (_) {
+    const s = new Date(d.getTime() - 6 * 3600e3);              // Monterrey: UTC-6 todo el año
+    return [s.getUTCFullYear(), s.getUTCMonth() + 1, s.getUTCDate()];
+  }
+}
+function dayNumber() {
+  const [y, m, d] = mtyDate();
+  return Math.max(1, Math.round((Date.UTC(y, m - 1, d) - START_DAY) / 864e5) + 1);
+}
+
+let toastTimer;
+function toast(text) {
+  const t = $('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function swapText(el, text, html) {
+  if (reduced) { html ? el.innerHTML = text : el.textContent = text; return; }
+  el.classList.add('swap-out');
+  setTimeout(() => { html ? el.innerHTML = text : el.textContent = text; el.classList.remove('swap-out'); }, 320);
+}
+
+/* ================== Cielo: estrellas con parallax ================== */
+const Sky = (() => {
+  const c = $('sky'), ctx = c.getContext('2d');
+  const planet = $('planetWrap');
+  const LAYERS = [
+    { density: .00034, r: [.35, .8], a: [.25, .6], drift: 2.2, par: .12 },
+    { density: .00013, r: [.6, 1.15], a: [.4, .85], drift: 5, par: .35 },
+    { density: .000045, r: [1, 1.7], a: [.65, 1], drift: 9, par: .75 }
+  ];
+  const TINTS = ['255,255,255', '255,255,255', '210,225,255', '255,241,214'];
+  const rand = ([a, b]) => a + Math.random() * (b - a);
+  let W = 0, H = 0, layers = [], meteors = [], nextMeteor = 0, raf = 0, last = 0, t = 0;
+  let px = 0, py = 0, tx = 0, ty = 0;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    layers = LAYERS.map(L => ({
+      ...L,
+      stars: Array.from({ length: Math.round(W * H * L.density) + 6 }, () => ({
+        x: Math.random() * W, y: Math.random() * H, r: rand(L.r), a: rand(L.a),
+        f: rand([.5, 1.8]), p: Math.random() * 6.283, tint: TINTS[(Math.random() * TINTS.length) | 0]
+      }))
+    }));
+    if (reduced) draw(0);
+  }
+
+  function spawnMeteor() {
+    const ang = (200 + Math.random() * 18) * Math.PI / 180;    // hacia abajo a la izquierda
+    const speed = 900 + Math.random() * 500;
+    meteors.push({
+      x: W * (.35 + Math.random() * .75), y: -20 + Math.random() * H * .35,
+      vx: Math.cos(ang) * speed, vy: -Math.sin(ang) * speed,
+      len: 140 + Math.random() * 120, life: 0, max: .75 + Math.random() * .35
+    });
+  }
+
+  function draw(dt) {
+    ctx.clearRect(0, 0, W, H);
+    px += (tx - px) * .05; py += (ty - py) * .05;
+    const sy = window.scrollY || 0;
+    for (const L of layers) {
+      const ox = t * L.drift + px * L.par * 30, oy = sy * L.par * .25 + py * L.par * 30;
+      for (const s of L.stars) {
+        let x = (s.x - ox) % W; if (x < 0) x += W;
+        let y = (s.y - oy) % H; if (y < 0) y += H;
+        const tw = reduced ? 1 : .62 + .38 * Math.sin(t * s.f + s.p);
+        const a = s.a * tw;
+        ctx.fillStyle = `rgba(${s.tint},${a})`;
+        ctx.beginPath(); ctx.arc(x, y, s.r, 0, 6.283); ctx.fill();
+        if (s.r > 1.25) {                                       // halo + destello en estrellas cercanas
+          ctx.fillStyle = `rgba(${s.tint},${a * .12})`;
+          ctx.beginPath(); ctx.arc(x, y, s.r * 3.2, 0, 6.283); ctx.fill();
+          if (tw > .97) {
+            ctx.strokeStyle = `rgba(255,255,255,${(tw - .97) * 18})`; ctx.lineWidth = .7;
+            ctx.beginPath(); ctx.moveTo(x - 7, y); ctx.lineTo(x + 7, y); ctx.moveTo(x, y - 7); ctx.lineTo(x, y + 7); ctx.stroke();
+          }
+        }
+      }
+    }
+    if (!reduced) {
+      if (t > nextMeteor) { spawnMeteor(); nextMeteor = t + 5 + Math.random() * 9; }
+      meteors = meteors.filter(m => (m.life += dt) < m.max);
+      for (const m of meteors) {
+        m.x += m.vx * dt; m.y += m.vy * dt;
+        const k = m.life / m.max, alpha = Math.sin(Math.PI * k);
+        const sp = Math.hypot(m.vx, m.vy), ux = m.vx / sp, uy = m.vy / sp;
+        const g = ctx.createLinearGradient(m.x, m.y, m.x - ux * m.len, m.y - uy * m.len);
+        g.addColorStop(0, `rgba(255,255,255,${.9 * alpha})`);
+        g.addColorStop(.25, `rgba(180,210,255,${.35 * alpha})`);
+        g.addColorStop(1, 'rgba(180,210,255,0)');
+        ctx.strokeStyle = g; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(m.x - ux * m.len, m.y - uy * m.len); ctx.stroke();
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        ctx.beginPath(); ctx.arc(m.x, m.y, 1.4, 0, 6.283); ctx.fill();
+      }
+    }
+    planet.style.transform = `translate3d(${(-px * 10).toFixed(2)}px,${(-sy * .06 - py * 8).toFixed(2)}px,0)`;
+  }
+
+  function loop(now) {
+    const dt = Math.min(.05, (now - (last || now)) / 1000);
+    last = now; t += dt;
+    draw(dt);
+    raf = requestAnimationFrame(loop);
+  }
+  function start() { if (!raf && !reduced && !document.hidden) { last = 0; raf = requestAnimationFrame(loop); } }
+  function stop() { cancelAnimationFrame(raf); raf = 0; }
+
+  addEventListener('resize', () => { resize(); });
+  addEventListener('scroll', () => { if (reduced) draw(0); }, { passive: true });
+  addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { tx = (e.clientX / W - .5) * 2; ty = (e.clientY / H - .5) * 2; } }, { passive: true });
+  addEventListener('deviceorientation', e => {
+    if (e.gamma == null) return;
+    tx = Math.max(-1, Math.min(1, e.gamma / 30)); ty = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
+  }, { passive: true });
+  document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+
+  return { init() { resize(); reduced ? draw(0) : start(); }, reset() { stop(); resize(); reduced ? draw(0) : start(); } };
+})();
+
+/* ================== Planeta: textura que rota ================== */
+(function planetTexture() {
+  let seed = 11;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="none">';
+  for (let i = 0; i < 6; i++) {
+    const rx = 16 + rnd() * 26, ry = 10 + rnd() * 20;
+    s += `<ellipse cx="${(rx + rnd() * (200 - 2 * rx)).toFixed(1)}" cy="${(ry + rnd() * (200 - 2 * ry)).toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="#202a4a" fill-opacity="${(.16 + rnd() * .14).toFixed(2)}"/>`;
+  }
+  for (let i = 0; i < 30; i++) {
+    const r = 1.5 + rnd() * rnd() * 13, x = r + 2 + rnd() * (196 - 2 * r), y = 4 + rnd() * 192;
+    s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="#1b2240" fill-opacity=".26"/>`;
+    s += `<circle cx="${(x + r * .2).toFixed(1)}" cy="${(y - r * .2).toFixed(1)}" r="${(r * .78).toFixed(1)}" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="${Math.max(.5, r * .14).toFixed(2)}"/>`;
+  }
+  s += '</svg>';
+  $('planetSurface').style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
+})();
+
+/* ================== Confeti de estrellas ================== */
+const Confetti = (() => {
+  const c = $('fx'), ctx = c.getContext('2d');
+  const COLORS = ['#ffd60a', '#ffffff', '#64d2ff', '#0a84ff', '#ff9f0a', '#bf5af2', '#30d158'];
+  let parts = [], raf = 0, last = 0, W = 0, H = 0;
+  function size() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function star(r) {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const rr = i % 2 ? r * .45 : r, a = -Math.PI / 2 + i * Math.PI / 5;
+      ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+    }
+    ctx.closePath();
+  }
+  function loop(now) {
+    const dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
+    ctx.clearRect(0, 0, W, H);
+    parts = parts.filter(p => (p.life += dt) < p.max);
+    for (const p of parts) {
+      p.vx *= .985; p.vy = p.vy * .985 + 340 * dt;
+      p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+      const k = p.life / p.max;
+      ctx.save();
+      ctx.globalAlpha = k > .7 ? (1 - k) / .3 : 1;
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.color; star(p.r); ctx.fill();
+      ctx.restore();
+    }
+    if (parts.length) raf = requestAnimationFrame(loop);
+    else { raf = 0; last = 0; ctx.clearRect(0, 0, W, H); }
+  }
+  addEventListener('resize', size);
+  return {
+    burst(x, y, n = 120) {
+      if (reduced) return;
+      if (!W) size();
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, v = 220 + Math.random() * 520;
+        parts.push({
+          x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 260,
+          r: 3 + Math.random() * 6, rot: Math.random() * 6, vr: (Math.random() - .5) * 10,
+          color: COLORS[(Math.random() * COLORS.length) | 0], life: 0, max: 2.2 + Math.random() * 1.6
+        });
+      }
+      if (!raf) raf = requestAnimationFrame(loop);
+    }
+  };
+})();
+
+/* ================== Días, mensaje y cuenta regresiva ================== */
+let currentDay = 0;
+function renderDay() {
+  const n = dayNumber();
+  if (n === currentDay) return;
+  currentDay = n;
+  if (!FREED) {
+    $('days').textContent = n;
+    $('eyebrow').textContent = `Misión · Día ${n}`;
+    $('message').textContent = MESSAGES[(n - 1) % MESSAGES.length].replace('{n}', n);
+  }
+}
+
+function renderCountdown() {
+  if (FREED) return;
+  const now = Date.now(), left = BLACK_FRIDAY - now;
+  const pct = Math.max(0, Math.min(1, left / (BLACK_FRIDAY - O2_START)));
+  const fill = $('o2Fill');
+  fill.style.transform = `scaleX(${pct})`;
+  fill.dataset.level = pct < .1 ? 'crit' : pct < .3 ? 'low' : 'ok';
+  $('o2Pct').textContent = `O₂ ${Math.ceil(pct * 100)}%`;
+  if (left <= 0) {
+    $('o2Card').classList.add('ended');
+    $('o2Foot').textContent = 'La ventana de rescate está abierta';
+    return;
+  }
+  const s = Math.floor(left / 1000);
+  $('cdD').textContent = pad(Math.floor(s / 86400));
+  $('cdH').textContent = pad(Math.floor(s % 86400 / 3600));
+  $('cdM').textContent = pad(Math.floor(s % 3600 / 60));
+  $('cdS').textContent = pad(s % 60);
+}
+
+function tick() { renderDay(); renderCountdown(); }
+function startClock() {
+  tick();
+  setTimeout(() => { tick(); setInterval(tick, 1000); }, 1000 - (Date.now() % 1000));
+}
+
+function showMessage() {
+  const b = $('bubble');
+  if (reduced) { b.classList.remove('typing'); return; }
+  setTimeout(() => b.classList.remove('typing'), 1700);
+}
+
+/* ================== Candado y hoja modal ================== */
+const scrim = $('scrim'), sheet = $('sheet');
+let lastFocus = null;
+
+function dramaFor(n) {
+  let d = DRAMA[0];
+  for (const x of DRAMA) if (n >= x.from) d = x;
+  return { ...d, level: DRAMA.indexOf(d) };
+}
+
+function openSheet() {
+  const n = dayNumber(), d = dramaFor(n);
+  $('sheetTitle').textContent = d.title;
+  $('dramaTag').textContent = `Reporte del día ${n}`;
+  $('dramaText').textContent = d.text;
+  sheet.dataset.level = d.level;
+  lastFocus = document.activeElement;
+  scrim.classList.add('open');
+  scrim.setAttribute('aria-hidden', 'false');
+  document.documentElement.style.overflow = 'hidden';
+  setTimeout(() => $('useKey').focus({ preventScroll: true }), 360);
+}
+function closeSheet() {
+  scrim.classList.remove('open');
+  scrim.setAttribute('aria-hidden', 'true');
+  document.documentElement.style.overflow = '';
+  if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+}
+
+function tapLock() {
+  if (FREED) return;
+  const s = $('lockShake');
+  s.classList.remove('shake'); void s.getBoundingClientRect(); s.classList.add('shake');
+  vibrate([24, 50, 24, 50, 60]);
+  setTimeout(openSheet, reduced ? 0 : 420);
+}
+
+$('lock').addEventListener('click', tapLock);
+$('lock').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tapLock(); } });
+$('lockShake').addEventListener('animationend', e => e.currentTarget.classList.remove('shake'));
+$('chip').addEventListener('click', () => FREED ? replay() : tapLock());
+scrim.addEventListener('click', e => { if (e.target === scrim) closeSheet(); });
+$('later').addEventListener('click', () => {
+  vibrate(12);
+  closeSheet();
+  setTimeout(() => toast('Está bien… el astronauta espera un día más 🥲'), 250);
+});
+$('useKey').addEventListener('click', () => { vibrate(15); setTimeout(closeSheet, 300); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && scrim.classList.contains('open')) closeSheet(); });
+
+// Tocar al astronauta: un pequeño giro y un mensaje
+const PLEAS = ['¡Sácame de aquí! 🥺', 'Psst… la llave la tiene Mamá', 'Sigo aquí. Flotando. Esperando.', 'Hola, Mamá 👋', '¿Ya viste el candado rojo?'];
+let pleaIdx = 0;
+$('astro').addEventListener('click', () => {
+  const a = $('astroBump');
+  a.classList.remove('bump'); void a.getBoundingClientRect(); a.classList.add('bump');
+  vibrate(10);
+  toast(FREED ? '¡Gracias, Mamá! 💙' : PLEAS[pleaIdx++ % PLEAS.length]);
+});
+$('astro').style.cursor = 'pointer';
+
+/* ================== Modo liberado (?liberado=1) ================== */
+function cellCenter() {
+  const r = $('chamber').getBoundingClientRect();
+  return [r.left + r.width / 2, r.top + r.height * .45];
+}
+let freedTimers = [];
+function runFreedSequence() {
+  freedTimers.forEach(clearTimeout); freedTimers = [];
+  const root = document.documentElement;
+  root.classList.remove('freed'); void root.offsetWidth; root.classList.add('freed');
+  const at = (ms, fn) => freedTimers.push(setTimeout(fn, reduced ? 0 : ms));
+  at(400, () => vibrate([30, 40, 30]));
+  at(1200, () => vibrate(20));
+  at(2500, () => { const [x, y] = cellCenter(); Confetti.burst(x, y, 140); vibrate([40, 30, 80]); });
+  at(4300, () => { const [x, y] = cellCenter(); Confetti.burst(x, y - 60, 90); });
+  at(5200, () => { Confetti.burst(innerWidth * .2, innerHeight * .25, 50); Confetti.burst(innerWidth * .8, innerHeight * .25, 50); });
+}
+function replay() {
+  scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  setTimeout(runFreedSequence, 350);
+}
+
+function setupFreed() {
+  $('liveText').textContent = 'LIBERADO';
+  $('live').querySelector('i').style.cssText = 'background:#30d158;box-shadow:0 0 8px rgba(48,209,88,.8)';
+  $('daysLabel').textContent = 'Estuvo encerrado';
+  $('days').innerHTML = `${dayNumber()}<small>${dayNumber() === 1 ? 'día' : 'días'}</small>`;
+  $('ransom').innerHTML = '<span class="paid">Pagado</span>';
+  $('ransomFoot').textContent = '✓ Gracias, Mamá 💙';
+  $('o2Label').textContent = 'Oxígeno';
+  $('o2Pct').textContent = 'O₂ 100%';
+  $('countdown').style.display = 'none';
+  $('o2Fill').style.transform = 'scaleX(1)';
+  $('o2Fill').dataset.level = 'full';
+  $('o2Foot').textContent = 'Respira tranquilo: ya está libre.';
+  $('message').textContent = FREED_TEXT.message;
+  $('chipText').innerHTML = '<b style="color:var(--text-2);font-weight:600">Celda 01 · Abierta</b> — ver otra vez';
+  $('ctaText').textContent = 'Ver el rescate otra vez';
+  $('ctaIcon').innerHTML = '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>';
+  $('ctaNote').textContent = 'Misión cumplida · #40921';
+  $('cta').removeAttribute('target');
+  $('cta').addEventListener('click', e => { e.preventDefault(); vibrate(12); replay(); });
+  $('lock').setAttribute('aria-hidden', 'true');
+  $('lock').removeAttribute('tabindex');
+  setTimeout(() => {
+    swapText($('eyebrow'), FREED_TEXT.eyebrow);
+    swapText($('title'), FREED_TEXT.title);
+    swapText($('subtitle'), FREED_TEXT.sub);
+  }, reduced ? 0 : 1500);
+  setTimeout(runFreedSequence, reduced ? 0 : 900);
+}
+
+/* ================== Instalación (PWA) ================== */
+(function install() {
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (standalone || localStorage.getItem('astro-install-hidden')) return;
+  const box = $('install');
+  const show = () => { box.classList.add('show'); document.body.classList.add('has-install'); };
+  const hide = () => { box.classList.remove('show'); document.body.classList.remove('has-install'); localStorage.setItem('astro-install-hidden', '1'); };
+  $('installX').addEventListener('click', hide);
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let deferred = null;
+  addEventListener('beforeinstallprompt', e => {
+    e.preventDefault(); deferred = e;
+    $('installGo').hidden = false;
+    setTimeout(show, 2500);
+  });
+  $('installGo').addEventListener('click', async () => {
+    if (!deferred) return;
+    deferred.prompt();
+    await deferred.userChoice.catch(() => {});
+    deferred = null; hide();
+  });
+  if (isIOS) {
+    $('installText').innerHTML = '<b>Instala Astronauta</b>Toca Compartir y luego «Agregar a inicio».';
+    setTimeout(show, 3000);
+  }
+})();
+
+/* ================== Arranque ================== */
+reduceMQ.addEventListener && reduceMQ.addEventListener('change', e => { reduced = e.matches; Sky.reset(); });
+Sky.init();
+startClock();
+if (FREED) setupFreed();
+showMessage();
+
+if ('serviceWorker' in navigator) {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+})();
+</script>
+</body>
+</html>
