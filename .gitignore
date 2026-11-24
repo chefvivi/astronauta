@@ -4,3 +4,4 @@ xcuserdata/
 DerivedData/
 *.xcuserstate
 .claude/launch.json
+*.local.txt

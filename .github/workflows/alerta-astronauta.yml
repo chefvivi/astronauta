@@ -1,0 +1,75 @@
+name: Alerta del astronauta
+
+on:
+  schedule:
+    - cron: "0 15 * * *" # 9:00 a. m. en Monterrey (UTC-6)
+  workflow_dispatch:
+    inputs:
+      variante:
+        description: "Mensaje a mandar (1-7). Déjalo vacío para mandar el que toca hoy."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  alerta:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mandar la alerta por ntfy
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          VARIANTE: ${{ inputs.variante }}
+          APP_URL: https://chefvivi.github.io/astronauta/
+        run: |
+          python3 - <<'EOF'
+          import os, sys, urllib.parse, urllib.request
+          from datetime import date, datetime, timedelta, timezone
+
+          topic = os.environ.get("NTFY_TOPIC", "").strip()
+          if not topic:
+              sys.exit("Falta el secret NTFY_TOPIC")
+          app = os.environ["APP_URL"]
+
+          # Día de encierro: el 23/11/2026 es el día 1 (hora de Monterrey, UTC-6 todo el año).
+          hoy = datetime.now(timezone(timedelta(hours=-6))).date()
+          dia = max(1, (hoy - date(2026, 11, 23)).days + 1)
+
+          # 7 mensajes que rotan por día.
+          mensajes = [
+              ("Alerta del Centro de Control",
+               "El astronauta azul sigue encerrado. Solo una persona tiene la llave."),
+              ("Día {dia} de encierro",
+               "El astronauta lleva {dia} {dias} en la celda 01. Extraña a su familia y sueña con salir a explorar."),
+              ("Mensaje entrante de la celda 01",
+               "\"Mamá, ¿me escuchas? No tengo con quién jugar ni con quién hablar. Por favor, sácame de aquí.\""),
+              ("El candado rojo sigue cerrado",
+               "Hoy tampoco se abrió. Solo se abre con una compra autorizada por Mamá."),
+              ("El astronauta pensó en ti",
+               "Anoche soñó otra vez que salía a explorar el universo… y que tú le abrías la puerta."),
+              ("Su ánimo va bajando",
+               "Ya platica con su reflejo en el visor. El Centro de Control recomienda rescatarlo pronto."),
+              ("Recordatorio de misión",
+               "Rescate: $1,399. Un solo toque y el astronauta queda libre para siempre."),
+          ]
+          v = os.environ.get("VARIANTE", "").strip()
+          i = int(v) - 1 if v.isdigit() and 1 <= int(v) <= len(mensajes) else (dia - 1) % len(mensajes)
+          titulo, texto = (s.format(dia=dia, dias="día" if dia == 1 else "días") for s in mensajes[i])
+
+          params = urllib.parse.urlencode({
+              "title": titulo,
+              "priority": "high",
+              "tags": "rocket",
+              "click": app,
+              "icon": app + "icons/icon-192.png",
+              "actions": f"view, Liberar al astronauta, {app}, clear=true",
+          })
+          req = urllib.request.Request(
+              f"https://ntfy.sh/{urllib.parse.quote(topic)}?{params}",
+              data=texto.encode("utf-8"),
+              method="POST",
+          )
+          with urllib.request.urlopen(req, timeout=30) as r:
+              print(f"Día {dia} · mensaje {i + 1} · HTTP {r.status}")
+          EOF
