@@ -1378,6 +1378,9 @@ function setupFreed() {
 }
 
 /* ================== Historia de la primera vez ================== */
+// La app instalada guarda aparte si ya vio la historia: así sale la primera vez que se abre
+// desde el ícono, aunque ya se haya visto en el navegador al instalarla.
+const STORY_KEY = (matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) ? 'astro-story-seen-app' : 'astro-story-seen';
 const Story = (() => {
   const el = $('story'), tap = $('storyTap');
   const scenes = [...el.querySelectorAll('.scene')], N = scenes.length;
@@ -1421,7 +1424,7 @@ const Story = (() => {
   function close() {
     if (!isOpen) return;
     isOpen = false;
-    try { localStorage.setItem('astro-story-seen', '1'); } catch (_) {}
+    try { localStorage.setItem(STORY_KEY, '1'); } catch (_) {}
     clearTimeout(buzzTimer);
     el.classList.remove('open', 'paused');
     document.documentElement.classList.remove('story-open');
@@ -1497,7 +1500,7 @@ showMessage();
 
 // La historia sale la primera vez que se abre la app (o con ?historia=1).
 let storySeen = false;
-try { storySeen = !!localStorage.getItem('astro-story-seen'); } catch (_) {}
+try { storySeen = !!localStorage.getItem(STORY_KEY); } catch (_) {}
 if (!FREED && (new URLSearchParams(location.search).has('historia') || !storySeen)) Story.open();
 else Story.skip();
 
